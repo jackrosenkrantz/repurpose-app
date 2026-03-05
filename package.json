@@ -1,0 +1,12 @@
+{
+  "name": "repurpose-app",
+  "version": "1.0.0",
+  "description": "Content Repurposing Engine — turn one piece of content into 15 platform-specific outputs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
