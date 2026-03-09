@@ -1,6 +1,6 @@
 # Repurpose App
 
-Content Repurposing Engine — turns one piece of content into 15 platform-specific outputs.
+Content Repurposing Engine — turns one piece of content into 5 ready-to-ship variants + creative brief.
 
 ## Stack
 - Node.js + Express serving static files from `public/`
