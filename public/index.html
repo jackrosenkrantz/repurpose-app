@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Repurpose Engine</title>
-  <meta name="description" content="Turn one piece of content into 15 platform-specific outputs.">
+  <meta name="description" content="Turn one piece of content into five ready-to-ship variants.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Lora:wght@400&display=swap" rel="stylesheet">
   <style>
@@ -214,20 +214,72 @@
       animation: fadeUp 0.3s ease both;
     }
     .output-card:nth-child(1) { animation-delay: 0s; }
-    .output-card:nth-child(2) { animation-delay: 0.03s; }
-    .output-card:nth-child(3) { animation-delay: 0.06s; }
-    .output-card:nth-child(4) { animation-delay: 0.09s; }
-    .output-card:nth-child(5) { animation-delay: 0.12s; }
-    .output-card:nth-child(6) { animation-delay: 0.15s; }
-    .output-card:nth-child(7) { animation-delay: 0.18s; }
-    .output-card:nth-child(8) { animation-delay: 0.21s; }
-    .output-card:nth-child(9) { animation-delay: 0.24s; }
-    .output-card:nth-child(10) { animation-delay: 0.27s; }
-    .output-card:nth-child(11) { animation-delay: 0.3s; }
-    .output-card:nth-child(12) { animation-delay: 0.33s; }
-    .output-card:nth-child(13) { animation-delay: 0.36s; }
-    .output-card:nth-child(14) { animation-delay: 0.39s; }
-    .output-card:nth-child(15) { animation-delay: 0.42s; }
+    .output-card:nth-child(2) { animation-delay: 0.04s; }
+    .output-card:nth-child(3) { animation-delay: 0.08s; }
+    .output-card:nth-child(4) { animation-delay: 0.12s; }
+    .output-card:nth-child(5) { animation-delay: 0.16s; }
+    .output-card:nth-child(6) { animation-delay: 0.2s; }
+    .output-card:nth-child(7) { animation-delay: 0.24s; }
+    .output-card:nth-child(8) { animation-delay: 0.28s; }
+    .output-card:nth-child(9) { animation-delay: 0.32s; }
+
+    /* Creative brief — full width, distinct style */
+    .output-card.brief-card {
+      grid-column: 1 / -1;
+      border-color: var(--amber);
+      border-width: 1px;
+      background: linear-gradient(135deg, var(--surface) 0%, rgba(196, 149, 106, 0.05) 100%);
+    }
+    .brief-card .brief-field {
+      margin-bottom: 10px;
+    }
+    .brief-card .brief-label {
+      color: var(--amber);
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .brief-card blockquote {
+      border-left: 2px solid var(--stone);
+      padding-left: 12px;
+      margin: 4px 0;
+      color: var(--earth);
+      font-style: italic;
+    }
+    .brief-card .angles {
+      color: var(--earth);
+      font-size: 0.85rem;
+    }
+
+    /* Anchor comments card */
+    .output-card.comments-card .comment-option {
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--stone);
+    }
+    .output-card.comments-card .comment-option:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .comment-label {
+      color: var(--amber);
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    /* Image recs card */
+    .output-card.recs-card .rec-item {
+      margin-bottom: 10px;
+    }
+    .rec-type {
+      color: var(--amber);
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(12px); }
@@ -403,7 +455,7 @@
 
   <div class="header">
     <h1>Repurpose Engine</h1>
-    <p>One piece of content. Fifteen platform-ready outputs.</p>
+    <p>One piece of content. Five ready-to-ship variants.</p>
   </div>
 
   <div class="input-section">
@@ -452,14 +504,24 @@
     const statusText = document.getElementById('statusText');
     const outputsGrid = document.getElementById('outputsGrid');
 
-    const OUTPUT_ORDER = [
+    // V2 format
+    const V2_VARIANT_ORDER = ['sales', 'poetic', 'radical', 'weekend_bridge', 'short_contrarian'];
+    const V2_LABELS = {
+      sales: 'Sales',
+      poetic: 'Poetic',
+      radical: 'Radical',
+      weekend_bridge: 'Weekend Bridge',
+      short_contrarian: 'Short Contrarian Take'
+    };
+
+    // V1 format (backward compat for old jobs)
+    const V1_OUTPUT_ORDER = [
       'linkedin_post', 'twitter_post', 'threads_post', 'instagram_caption',
       'twitter_thread', 'facebook_post', 'newsletter_section', 'blog_excerpt',
       'pull_quotes', 'email_subject_lines', 'one_liner', 'cta_variations',
       'linkedin_article', 'youtube_description', 'blog_post'
     ];
-
-    const OUTPUT_LABELS = {
+    const V1_OUTPUT_LABELS = {
       linkedin_post: 'LinkedIn Post',
       linkedin_article: 'LinkedIn Article Intro',
       twitter_post: 'X/Twitter Post',
@@ -575,45 +637,151 @@
       }
     }
 
+    function isV2(outputs) {
+      return outputs.format_version === 2 || 'variants' in outputs;
+    }
+
     function renderOutputs(outputs) {
       status.classList.remove('visible');
       outputsGrid.classList.remove('hidden');
       outputsGrid.innerHTML = '';
 
-      for (const key of OUTPUT_ORDER) {
+      if (isV2(outputs)) {
+        renderV2(outputs);
+      } else {
+        renderV1(outputs);
+      }
+    }
+
+    function renderV2(outputs) {
+      // Creative Brief (full width, distinct style)
+      const brief = outputs.creative_brief;
+      if (brief && typeof brief === 'object') {
+        const card = document.createElement('div');
+        card.className = 'output-card brief-card';
+
+        let html = '<div class="card-header"><h3>Creative Brief</h3></div>';
+
+        if (brief.core_insight) {
+          html += `<div class="brief-field"><div class="brief-label">Core Insight</div><div class="content">${esc(brief.core_insight)}</div></div>`;
+        }
+        if (brief.audience) {
+          html += `<div class="brief-field"><div class="brief-label">Audience</div><div class="content">${esc(brief.audience)}</div></div>`;
+        }
+        if (brief.tension) {
+          html += `<div class="brief-field"><div class="brief-label">Tension</div><div class="content">${esc(brief.tension)}</div></div>`;
+        }
+        if (brief.verbatim_lines && brief.verbatim_lines.length) {
+          html += '<div class="brief-field"><div class="brief-label">Best Verbatim Lines</div>';
+          for (const line of brief.verbatim_lines) {
+            html += `<blockquote>${esc(line)}</blockquote>`;
+          }
+          html += '</div>';
+        }
+        if (brief.other_angles && brief.other_angles.length) {
+          html += '<div class="brief-field"><div class="brief-label">Other Angles</div><div class="angles">';
+          for (const angle of brief.other_angles) {
+            html += `<div>- ${esc(angle)}</div>`;
+          }
+          html += '</div></div>';
+        }
+
+        card.innerHTML = html;
+        outputsGrid.appendChild(card);
+      }
+
+      // 5 Variants
+      const variants = outputs.variants || {};
+      for (const key of V2_VARIANT_ORDER) {
+        const text = variants[key];
+        if (!text) continue;
+        const label = V2_LABELS[key] || key;
+        const card = document.createElement('div');
+        card.className = 'output-card';
+        card.innerHTML = `
+          <div class="card-header">
+            <h3>${label}</h3>
+            <button class="copy-btn" onclick="copyText(this, ${JSON.stringify(text).replace(/</g, '\\u003c')})">Copy</button>
+          </div>
+          <div class="content">${esc(text)}</div>
+        `;
+        outputsGrid.appendChild(card);
+      }
+
+      // Anchor Comments
+      const comments = outputs.anchor_comments;
+      if (comments && typeof comments === 'object') {
+        const card = document.createElement('div');
+        card.className = 'output-card comments-card';
+        let html = '<div class="card-header"><h3>Anchor Comments</h3></div>';
+
+        const commentTypes = [
+          ['engagement', 'Engagement'],
+          ['teaching', 'Teaching'],
+          ['social_proof', 'Social Proof']
+        ];
+        for (const [key, label] of commentTypes) {
+          if (comments[key]) {
+            html += `<div class="comment-option">
+              <div class="comment-label">Option: ${label}</div>
+              <div class="content">${esc(comments[key])}</div>
+              <button class="copy-btn" style="margin-top:6px" onclick="copyText(this, ${JSON.stringify(comments[key]).replace(/</g, '\\u003c')})">Copy</button>
+            </div>`;
+          }
+        }
+        card.innerHTML = html;
+        outputsGrid.appendChild(card);
+      }
+
+      // Image Recommendations
+      const recs = outputs.image_recs;
+      if (recs && Array.isArray(recs) && recs.length) {
+        const card = document.createElement('div');
+        card.className = 'output-card recs-card';
+        let html = '<div class="card-header"><h3>Image Recommendations</h3></div>';
+        for (let i = 0; i < recs.length; i++) {
+          const rtype = (recs[i].type || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+          html += `<div class="rec-item"><div class="rec-type">Option ${i + 1} (${esc(rtype)})</div><div class="content">${esc(recs[i].description || '')}</div></div>`;
+        }
+        card.innerHTML = html;
+        outputsGrid.appendChild(card);
+      }
+    }
+
+    function renderV1(outputs) {
+      for (const key of V1_OUTPUT_ORDER) {
         if (!(key in outputs)) continue;
         const value = outputs[key];
-        const label = OUTPUT_LABELS[key] || key;
+        const label = V1_OUTPUT_LABELS[key] || key;
 
         const card = document.createElement('div');
         card.className = 'output-card';
         if (key === 'blog_post') card.className += ' full-width';
 
         let contentHtml = '';
-        let copyText = '';
+        let copyVal = '';
 
         if (key === 'blog_post' && typeof value === 'object') {
           const title = value.title || '';
           const body = value.body || '';
           contentHtml = `<div class="blog-title">${esc(title)}</div><div class="content blog-body">${esc(body)}</div>`;
-          copyText = `${title}\n\n${body}`;
+          copyVal = `${title}\n\n${body}`;
         } else if (Array.isArray(value)) {
           const items = value.map((v, i) => `${i + 1}. ${v}`).join('\n');
           contentHtml = `<div class="content">${esc(items)}</div>`;
-          copyText = value.join('\n');
+          copyVal = value.join('\n');
         } else {
           contentHtml = `<div class="content">${esc(String(value))}</div>`;
-          copyText = String(value);
+          copyVal = String(value);
         }
 
         card.innerHTML = `
           <div class="card-header">
             <h3>${label}</h3>
-            <button class="copy-btn" onclick="copyText(this, ${JSON.stringify(copyText).replace(/</g, '\\u003c')})">Copy</button>
+            <button class="copy-btn" onclick="copyText(this, ${JSON.stringify(copyVal).replace(/</g, '\\u003c')})">Copy</button>
           </div>
           ${contentHtml}
         `;
-
         outputsGrid.appendChild(card);
       }
     }
