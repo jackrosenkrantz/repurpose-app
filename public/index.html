@@ -312,7 +312,22 @@
       border-color: var(--amber);
       color: var(--amber);
     }
-    .copy-btn.copied {
+    .copy-btn.copied, .save-btn.saved {
+      border-color: var(--sage);
+      color: var(--sage);
+    }
+
+    .save-btn {
+      background: none;
+      border: 1px solid var(--stone);
+      color: var(--earth);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .save-btn:hover {
       border-color: var(--sage);
       color: var(--sage);
     }
@@ -701,7 +716,10 @@
         card.innerHTML = `
           <div class="card-header">
             <h3>${label}</h3>
-            <button class="copy-btn" onclick="copyText(this, ${JSON.stringify(text).replace(/</g, '\\u003c')})">Copy</button>
+            <div style="display:flex;gap:6px">
+              <button class="save-btn" onclick="saveToLibrary(this, ${JSON.stringify(text).replace(/</g, '\\u003c')}, '${key}')">Save</button>
+              <button class="copy-btn" onclick="copyText(this, ${JSON.stringify(text).replace(/</g, '\\u003c')})">Copy</button>
+            </div>
           </div>
           <div class="content">${esc(text)}</div>
         `;
@@ -801,6 +819,33 @@
           btn.classList.remove('copied');
         }, 2000);
       });
+    }
+
+    // Save to Voice Library
+    async function saveToLibrary(btn, text, variantType) {
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+      try {
+        const resp = await fetch(`${API_URL}/api/voice-library`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text,
+            variant_type: variantType,
+            source: 'repurpose_output'
+          })
+        });
+        if (resp.ok) {
+          btn.textContent = 'Saved';
+          btn.classList.add('saved');
+        } else {
+          btn.textContent = 'Error';
+          setTimeout(() => { btn.textContent = 'Save'; btn.disabled = false; }, 2000);
+        }
+      } catch (err) {
+        btn.textContent = 'Error';
+        setTimeout(() => { btn.textContent = 'Save'; btn.disabled = false; }, 2000);
+      }
     }
 
     // History
