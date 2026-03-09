@@ -895,6 +895,8 @@
 
     // Init
     renderHistory();
+    const jobParam = new URLSearchParams(location.search).get('job');
+    if (jobParam) loadJob(jobParam);
   </script>
 </body>
 </html>
