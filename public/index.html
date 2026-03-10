@@ -684,27 +684,35 @@
       }
     }
 
-    // History
+    // History — fetches from Supabase via anchor-bot API
     function saveToHistory(id, text) {
-      const history = JSON.parse(localStorage.getItem('repurpose_history') || '[]');
-      history.unshift({ id, preview: text.substring(0, 80), date: new Date().toLocaleDateString() });
-      if (history.length > 20) history.length = 20;
-      localStorage.setItem('repurpose_history', JSON.stringify(history));
-      renderHistory();
+      // Refresh the list from server to include the new job
+      setTimeout(loadHistory, 1000);
     }
 
-    function renderHistory() {
+    async function loadHistory() {
+      try {
+        const resp = await fetch(`${API_URL}/api/repurpose/recent?limit=10`);
+        const data = await resp.json();
+        if (!resp.ok || !data.jobs) throw new Error('Failed to load');
+        renderHistory(data.jobs);
+      } catch (err) {
+        console.warn('Failed to load recent jobs:', err);
+        document.getElementById('historySection').style.display = 'none';
+      }
+    }
+
+    function renderHistory(jobs) {
       const list = document.getElementById('historyList');
-      const history = JSON.parse(localStorage.getItem('repurpose_history') || '[]');
-      if (!history.length) {
+      if (!jobs || !jobs.length) {
         document.getElementById('historySection').style.display = 'none';
         return;
       }
       document.getElementById('historySection').style.display = 'block';
-      list.innerHTML = history.map(h => `
-        <div class="history-item" onclick="loadJob('${h.id}')">
-          <div class="h-preview">${esc(h.preview)}</div>
-          <div class="h-date">${h.date}</div>
+      list.innerHTML = jobs.map(j => `
+        <div class="history-item" onclick="loadJob('${j.id}')">
+          <div class="h-preview">${esc(j.preview || '(no preview)')}</div>
+          <div class="h-date">${new Date(j.created_at).toLocaleDateString()}</div>
         </div>
       `).join('');
     }
@@ -733,7 +741,7 @@
     }
 
     // Init
-    renderHistory();
+    loadHistory();
     const jobParam = new URLSearchParams(location.search).get('job');
     if (jobParam) loadJob(jobParam);
   </script>
