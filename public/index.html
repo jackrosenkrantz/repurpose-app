@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Repurpose Engine</title>
-  <meta name="description" content="Turn one piece of content into five ready-to-ship variants.">
+  <title>Repurpose</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Lora:wght@400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
   <style>
     html { color-scheme: dark; }
     :root {
@@ -18,7 +17,7 @@
       --sage: #7a8b6f;
       --amber: #c4956a;
       --amber-light: #2e2418;
-      --surface: #242019;
+      --card: #242019;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,143 +33,110 @@
 
     h1, h2, h3 { font-family: 'Lora', serif; font-weight: 400; }
 
-    /* Header */
-    .header {
-      text-align: center;
-      padding: 40px 20px 20px;
-    }
-    .header h1 {
-      font-size: 1.8rem;
-      color: var(--deep);
-      margin-bottom: 8px;
-    }
-    .header p {
-      color: var(--earth);
-      font-size: 0.9rem;
-    }
-
-    /* Input Section */
-    .input-section {
-      max-width: 720px;
+    .container {
+      max-width: 680px;
       margin: 0 auto;
       padding: 0 20px;
     }
 
-    .textarea-wrap {
-      position: relative;
-      margin-bottom: 16px;
+    /* Header */
+    .header {
+      padding: 40px 20px 12px;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 1.6rem;
+      color: var(--deep);
+      margin-bottom: 4px;
+    }
+    .header p {
+      color: var(--earth);
+      font-size: 0.8rem;
+      font-weight: 300;
     }
 
-    textarea {
-      width: 100%;
-      min-height: 200px;
-      background: var(--surface);
-      border: 1px solid var(--stone);
+    /* Card base */
+    .card {
+      background: var(--card);
       border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+    .card-label {
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--warm-gray);
+      margin-bottom: 10px;
+    }
+
+    /* Input section */
+    .input-card textarea {
+      width: 100%;
+      min-height: 140px;
+      background: transparent;
+      border: 1px solid var(--stone);
+      border-radius: 8px;
       color: var(--deep);
       font-family: 'Inter', sans-serif;
       font-weight: 300;
-      font-size: 0.95rem;
-      padding: 16px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      padding: 14px;
       resize: vertical;
       outline: none;
       transition: border-color 0.2s;
     }
-    textarea:focus { border-color: var(--amber); }
-    textarea::placeholder { color: var(--warm-gray); }
+    .input-card textarea:focus { border-color: var(--amber); }
+    .input-card textarea::placeholder { color: var(--warm-gray); font-style: italic; }
 
+    .input-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
     .char-count {
-      position: absolute;
-      bottom: 12px;
-      right: 16px;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--warm-gray);
     }
 
-    /* File Drop Zone */
-    .drop-zone {
-      border: 2px dashed var(--stone);
-      border-radius: 12px;
-      padding: 24px;
-      text-align: center;
-      color: var(--warm-gray);
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      margin-bottom: 16px;
-    }
-    .drop-zone:hover, .drop-zone.dragover {
-      border-color: var(--amber);
-      background: var(--amber-light);
-    }
-    .drop-zone input { display: none; }
-    .drop-zone .file-name {
-      color: var(--amber);
-      margin-top: 8px;
-      font-weight: 400;
-    }
-
-    /* Controls Row */
-    .controls {
+    .input-actions {
       display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-    }
-
-    .toggle-wrap {
-      display: flex;
-      align-items: center;
       gap: 8px;
-      font-size: 0.85rem;
+      align-items: center;
+    }
+
+    .coaching-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.7rem;
       color: var(--earth);
-    }
-
-    .toggle {
-      appearance: none;
-      width: 40px;
-      height: 22px;
-      background: var(--stone);
-      border-radius: 11px;
-      position: relative;
       cursor: pointer;
-      transition: background 0.2s;
     }
-    .toggle::after {
-      content: '';
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      width: 16px;
-      height: 16px;
-      background: var(--earth);
-      border-radius: 50%;
-      transition: transform 0.2s, background 0.2s;
-    }
-    .toggle:checked { background: var(--amber-light); }
-    .toggle:checked::after {
-      transform: translateX(18px);
-      background: var(--amber);
+    .coaching-toggle input {
+      accent-color: var(--amber);
+      cursor: pointer;
     }
 
-    .btn {
-      background: var(--amber-light);
-      color: var(--amber);
-      border: 1px solid var(--amber);
-      border-radius: 8px;
+    .btn-repurpose {
       padding: 10px 24px;
+      background: var(--amber);
+      color: var(--sand);
+      border: none;
+      border-radius: 8px;
       font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
       font-weight: 500;
-      font-size: 0.9rem;
       cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      margin-left: auto;
+      transition: opacity 0.2s;
     }
-    .btn:hover { background: rgba(196, 149, 106, 0.2); }
-    .btn:active { transform: scale(0.97); }
-    .btn:disabled {
-      opacity: 0.4;
+    .btn-repurpose:hover { opacity: 0.9; }
+    .btn-repurpose:disabled {
+      background: var(--stone);
+      color: var(--warm-gray);
       cursor: not-allowed;
     }
 
@@ -178,330 +144,295 @@
     .status {
       text-align: center;
       padding: 40px 20px;
-      color: var(--earth);
-      font-size: 0.9rem;
       display: none;
     }
     .status.visible { display: block; }
     .spinner {
-      display: inline-block;
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       border: 2px solid var(--stone);
       border-top-color: var(--amber);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
-      margin-bottom: 12px;
+      margin: 0 auto 14px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Output Grid */
-    .outputs {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 16px;
-    }
-    .outputs.hidden { display: none; }
-
-    .output-card {
-      background: var(--surface);
-      border: 1px solid var(--stone);
-      border-radius: 12px;
-      padding: 20px;
-      animation: fadeUp 0.3s ease both;
-    }
-    .output-card:nth-child(1) { animation-delay: 0s; }
-    .output-card:nth-child(2) { animation-delay: 0.04s; }
-    .output-card:nth-child(3) { animation-delay: 0.08s; }
-    .output-card:nth-child(4) { animation-delay: 0.12s; }
-    .output-card:nth-child(5) { animation-delay: 0.16s; }
-    .output-card:nth-child(6) { animation-delay: 0.2s; }
-    .output-card:nth-child(7) { animation-delay: 0.24s; }
-    .output-card:nth-child(8) { animation-delay: 0.28s; }
-    .output-card:nth-child(9) { animation-delay: 0.32s; }
-
-    /* Creative brief — full width, distinct style */
-    .output-card.brief-card {
-      grid-column: 1 / -1;
-      border-color: var(--amber);
-      border-width: 1px;
-      background: linear-gradient(135deg, var(--surface) 0%, rgba(196, 149, 106, 0.05) 100%);
-    }
-    .brief-card .brief-field {
-      margin-bottom: 10px;
-    }
-    .brief-card .brief-label {
-      color: var(--amber);
-      font-size: 0.75rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
-    }
-    .brief-card blockquote {
-      border-left: 2px solid var(--stone);
-      padding-left: 12px;
-      margin: 4px 0;
-      color: var(--earth);
-      font-style: italic;
-    }
-    .brief-card .angles {
-      color: var(--earth);
+    .status-text {
       font-size: 0.85rem;
+      color: var(--earth);
     }
 
-    /* Anchor comments card */
-    .output-card.comments-card .comment-option {
+    /* Output section */
+    .outputs { display: none; }
+    .outputs.visible { display: block; }
+
+    /* Brief card */
+    .brief-card {
+      border-left: 3px solid var(--amber);
+      margin-bottom: 20px;
+    }
+    .brief-insight {
+      font-family: 'Lora', serif;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: var(--deep);
       margin-bottom: 12px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--stone);
     }
-    .output-card.comments-card .comment-option:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
+    .brief-meta {
+      font-size: 0.78rem;
+      color: var(--earth);
+      line-height: 1.6;
     }
-    .comment-label {
-      color: var(--amber);
-      font-size: 0.75rem;
-      font-weight: 500;
-      margin-bottom: 4px;
+    .brief-meta span { color: var(--warm-gray); }
+    .brief-quotes {
+      margin-top: 12px;
+      padding-left: 14px;
+      border-left: 2px solid var(--stone);
     }
-
-    /* Image recs card */
-    .output-card.recs-card .rec-item {
-      margin-bottom: 10px;
-    }
-    .rec-type {
-      color: var(--amber);
-      font-size: 0.75rem;
-      font-weight: 500;
+    .brief-quotes p {
+      font-size: 0.82rem;
+      font-style: italic;
+      color: var(--earth);
+      margin-bottom: 6px;
+      line-height: 1.5;
     }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* Variant card */
+    .variant-card {
+      position: relative;
     }
-
-    .output-card .card-header {
+    .variant-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
     }
-
-    .output-card h3 {
-      font-size: 0.95rem;
-      color: var(--amber);
+    .variant-type {
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--warm-gray);
     }
-
-    .copy-btn {
-      background: none;
+    .variant-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-sm {
+      padding: 5px 12px;
       border: 1px solid var(--stone);
+      border-radius: 100px;
+      background: transparent;
       color: var(--earth);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 0.75rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
       cursor: pointer;
-      transition: border-color 0.2s, color 0.2s;
+      transition: all 0.2s;
     }
-    .copy-btn:hover {
-      border-color: var(--amber);
-      color: var(--amber);
-    }
-    .copy-btn.copied, .save-btn.saved {
-      border-color: var(--sage);
-      color: var(--sage);
-    }
+    .btn-sm:hover { border-color: var(--amber); color: var(--amber); }
+    .btn-sm.copied { border-color: var(--sage); color: var(--sage); }
+    .btn-sm.saved { border-color: var(--sage); color: var(--sage); }
 
-    .save-btn {
-      background: none;
-      border: 1px solid var(--stone);
-      color: var(--earth);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 0.75rem;
-      cursor: pointer;
-      transition: border-color 0.2s, color 0.2s;
-    }
-    .save-btn:hover {
-      border-color: var(--sage);
-      color: var(--sage);
-    }
-
-    .output-card .content {
-      font-size: 0.85rem;
-      line-height: 1.6;
+    .variant-text {
+      font-size: 0.88rem;
+      line-height: 1.7;
       color: var(--deep);
       white-space: pre-wrap;
-      max-height: 300px;
-      overflow-y: auto;
-    }
-    .output-card .content.blog-body {
-      max-height: 400px;
     }
 
-    .output-card .content::-webkit-scrollbar { width: 4px; }
-    .output-card .content::-webkit-scrollbar-track { background: transparent; }
-    .output-card .content::-webkit-scrollbar-thumb { background: var(--stone); border-radius: 2px; }
-
-    /* Blog post spans full width */
-    .output-card.full-width {
-      grid-column: 1 / -1;
+    /* Comments & recs cards */
+    .extras-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 8px;
     }
-
-    .blog-title {
-      font-family: 'Lora', serif;
-      font-size: 1.1rem;
-      color: var(--deep);
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--stone);
+    .extras-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px;
     }
-
-    /* History Sidebar */
-    .history-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: var(--surface);
-      border: 1px solid var(--stone);
-      color: var(--earth);
-      border-radius: 8px;
-      padding: 8px 14px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      z-index: 100;
-      transition: border-color 0.2s;
+    .extras-card .card-label { margin-bottom: 8px; }
+    .extras-item {
+      margin-bottom: 10px;
     }
-    .history-toggle:hover { border-color: var(--amber); color: var(--amber); }
-
-    .history-panel {
-      position: fixed;
-      top: 0;
-      right: -320px;
-      width: 300px;
-      height: 100vh;
-      background: var(--surface);
-      border-left: 1px solid var(--stone);
-      padding: 60px 20px 20px;
-      overflow-y: auto;
-      transition: right 0.3s ease;
-      z-index: 99;
-    }
-    .history-panel.open { right: 0; }
-
-    .history-panel h3 {
-      font-size: 1rem;
-      color: var(--deep);
-      margin-bottom: 16px;
-    }
-
-    .history-item {
-      padding: 12px;
-      border: 1px solid var(--stone);
-      border-radius: 8px;
-      margin-bottom: 8px;
-      cursor: pointer;
-      transition: border-color 0.2s;
-    }
-    .history-item:hover { border-color: var(--amber); }
-    .history-item .h-date {
-      font-size: 0.7rem;
-      color: var(--warm-gray);
+    .extras-item:last-child { margin-bottom: 0; }
+    .extras-item-label {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--amber);
       margin-bottom: 4px;
     }
-    .history-item .h-preview {
+    .extras-item-text {
       font-size: 0.8rem;
+      line-height: 1.5;
       color: var(--earth);
+    }
+
+    /* History */
+    .history-section {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--stone);
+    }
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .history-header h3 {
+      font-size: 0.95rem;
+      color: var(--earth);
+    }
+    .history-list { display: none; }
+    .history-list.open { display: block; }
+    .history-item {
+      padding: 12px 16px;
+      background: var(--card);
+      border-radius: 8px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .history-item:hover { border-left: 3px solid var(--amber); }
+    .h-preview {
+      font-size: 0.8rem;
+      color: var(--deep);
+      flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+    .h-date {
+      font-size: 0.65rem;
+      color: var(--warm-gray);
+      margin-left: 12px;
+      white-space: nowrap;
+    }
+    .btn-toggle {
+      padding: 5px 14px;
+      border: 1px solid var(--stone);
+      border-radius: 100px;
+      background: transparent;
+      color: var(--earth);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-toggle:hover { border-color: var(--amber); color: var(--amber); }
 
-    /* Bottom Nav */
+    /* Bottom nav */
     nav {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
+      z-index: 100;
       background: rgba(26, 23, 20, 0.92);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-top: 1px solid var(--stone);
-      padding: 12px 20px;
+      padding: 10px 16px 14px;
       display: flex;
       justify-content: center;
-      gap: 12px;
-      z-index: 90;
+      gap: 6px;
     }
     nav a {
-      color: var(--earth);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--warm-gray);
       text-decoration: none;
-      font-size: 0.8rem;
       padding: 6px 14px;
-      border: 1px solid var(--stone);
-      border-radius: 20px;
-      transition: border-color 0.2s, color 0.2s;
+      border-radius: 100px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
     }
-    nav a:hover, nav a.active {
-      border-color: var(--amber);
+    nav a:hover { color: var(--amber); border-color: var(--stone); }
+    nav a.active {
       color: var(--amber);
+      border-color: var(--stone);
+      background: var(--amber-light);
     }
 
+    /* Fade in animation */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeUp 0.5s ease both;
+    }
+
+    /* Responsive */
     @media (max-width: 600px) {
-      .header h1 { font-size: 1.4rem; }
-      .outputs { grid-template-columns: 1fr; }
-      .controls { flex-direction: column; align-items: stretch; }
-      .btn { margin-left: 0; }
+      .header h1 { font-size: 1.3rem; }
+      .extras-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <button class="history-toggle" onclick="toggleHistory()">History</button>
-  <div class="history-panel" id="historyPanel">
-    <h3>Recent Jobs</h3>
-    <div id="historyList"></div>
-  </div>
-
   <div class="header">
-    <h1>Repurpose Engine</h1>
-    <p>One piece of content. Five ready-to-ship variants.</p>
+    <h1>Repurpose</h1>
+    <p>One piece of content, five ready-to-ship variants.</p>
   </div>
 
-  <div class="input-section">
-    <div class="textarea-wrap">
-      <textarea id="contentInput" placeholder="Paste your content here — transcript, blog draft, voice memo dump, anything with substance..."></textarea>
-      <span class="char-count" id="charCount">0 chars</span>
+  <div class="container">
+
+    <!-- Input -->
+    <div class="card input-card" id="inputSection">
+      <div class="card-label">Content</div>
+      <textarea id="contentInput" placeholder="Paste content, a topic, or a prompt..."></textarea>
+      <div class="input-meta">
+        <span class="char-count" id="charCount">0</span>
+        <div class="input-actions">
+          <label class="coaching-toggle">
+            <input type="checkbox" id="coachingToggle">
+            Privacy filter
+          </label>
+          <button class="btn-repurpose" id="repurposeBtn" onclick="repurpose()">Repurpose</button>
+        </div>
+      </div>
     </div>
 
-    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-      Drop a file here or click to upload (.txt, .md, .pdf, .docx)
-      <input type="file" id="fileInput" accept=".txt,.md,.pdf,.docx">
-      <div class="file-name" id="fileName"></div>
+    <!-- Status -->
+    <div class="status" id="status">
+      <div class="spinner"></div>
+      <div class="status-text" id="statusText">Generating content...</div>
     </div>
 
-    <div class="controls">
-      <label class="toggle-wrap">
-        <input type="checkbox" class="toggle" id="coachingToggle">
-        Coaching content (privacy filter)
-      </label>
-      <button class="btn" id="repurposeBtn" onclick="repurpose()">Repurpose</button>
+    <!-- Outputs -->
+    <div class="outputs" id="outputSection"></div>
+
+    <!-- History -->
+    <div class="history-section" id="historySection">
+      <div class="history-header">
+        <h3>Recent</h3>
+        <button class="btn-toggle" onclick="toggleHistory()">Show</button>
+      </div>
+      <div class="history-list" id="historyList"></div>
     </div>
+
   </div>
-
-  <div class="status" id="status">
-    <div class="spinner"></div>
-    <div id="statusText">Repurposing your content... this takes 30-60 seconds.</div>
-  </div>
-
-  <div class="outputs hidden" id="outputsGrid"></div>
 
   <nav>
+    <a href="https://anchor-1-production.up.railway.app/">Command Center</a>
     <a href="#" class="active">Repurpose</a>
   </nav>
 
@@ -510,300 +441,213 @@
 
     const contentInput = document.getElementById('contentInput');
     const charCount = document.getElementById('charCount');
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('fileInput');
-    const fileName = document.getElementById('fileName');
     const coachingToggle = document.getElementById('coachingToggle');
     const repurposeBtn = document.getElementById('repurposeBtn');
-    const status = document.getElementById('status');
+    const statusEl = document.getElementById('status');
     const statusText = document.getElementById('statusText');
-    const outputsGrid = document.getElementById('outputsGrid');
+    const outputSection = document.getElementById('outputSection');
+    const inputSection = document.getElementById('inputSection');
 
-    // V2 format
-    const V2_VARIANT_ORDER = ['sales', 'poetic', 'radical', 'weekend_bridge', 'short_contrarian'];
+    const V2_ORDER = ['sales', 'poetic', 'radical', 'weekend_bridge', 'short_contrarian'];
     const V2_LABELS = {
-      sales: 'Sales',
-      poetic: 'Poetic',
-      radical: 'Radical',
-      weekend_bridge: 'Weekend Bridge',
-      short_contrarian: 'Short Contrarian Take'
+      sales: 'Sales', poetic: 'Poetic', radical: 'Radical',
+      weekend_bridge: 'Weekend Bridge', short_contrarian: 'Short Contrarian'
     };
-
-    // V1 format (backward compat for old jobs)
-    const V1_OUTPUT_ORDER = [
-      'linkedin_post', 'twitter_post', 'threads_post', 'instagram_caption',
-      'twitter_thread', 'facebook_post', 'newsletter_section', 'blog_excerpt',
-      'pull_quotes', 'email_subject_lines', 'one_liner', 'cta_variations',
-      'linkedin_article', 'youtube_description', 'blog_post'
-    ];
-    const V1_OUTPUT_LABELS = {
-      linkedin_post: 'LinkedIn Post',
-      linkedin_article: 'LinkedIn Article Intro',
-      twitter_post: 'X/Twitter Post',
-      twitter_thread: 'X/Twitter Thread',
-      instagram_caption: 'Instagram Caption',
-      threads_post: 'Threads Post',
-      facebook_post: 'Facebook Post',
-      newsletter_section: 'Newsletter Section',
-      blog_post: 'Blog Post',
-      blog_excerpt: 'Blog Excerpt',
-      pull_quotes: 'Pull Quotes',
-      email_subject_lines: 'Email Subject Lines',
-      youtube_description: 'YouTube/Podcast Description',
-      one_liner: 'One-Liner / Tagline',
-      cta_variations: 'CTA Variations'
-    };
-
-    let uploadedText = null;
 
     // Char count
     contentInput.addEventListener('input', () => {
-      charCount.textContent = `${contentInput.value.length} chars`;
+      charCount.textContent = contentInput.value.length;
     });
 
-    // File upload
-    fileInput.addEventListener('change', handleFile);
-
-    dropZone.addEventListener('dragover', e => {
-      e.preventDefault();
-      dropZone.classList.add('dragover');
-    });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-    dropZone.addEventListener('drop', e => {
-      e.preventDefault();
-      dropZone.classList.remove('dragover');
-      if (e.dataTransfer.files.length) {
-        fileInput.files = e.dataTransfer.files;
-        handleFile();
-      }
-    });
-
-    function handleFile() {
-      const file = fileInput.files[0];
-      if (!file) return;
-
-      const ext = file.name.split('.').pop().toLowerCase();
-      if (!['txt', 'md', 'pdf', 'docx'].includes(ext)) {
-        fileName.textContent = 'Unsupported file type';
-        return;
-      }
-
-      fileName.textContent = file.name;
-
-      if (ext === 'txt' || ext === 'md') {
-        const reader = new FileReader();
-        reader.onload = e => {
-          uploadedText = e.target.result;
-          contentInput.value = uploadedText;
-          charCount.textContent = `${uploadedText.length} chars`;
-        };
-        reader.readAsText(file);
-      } else {
-        // For PDF/DOCX, we'll send as text (API doesn't handle files yet, user should paste)
-        fileName.textContent = `${file.name} — PDF/DOCX: paste the text content instead`;
-        uploadedText = null;
-      }
-    }
-
+    // Repurpose
     async function repurpose() {
       const text = contentInput.value.trim();
       if (!text || text.length < 50) {
-        alert('Content too short. Need at least 50 characters.');
+        alert('Need at least 50 characters.');
         return;
       }
 
       repurposeBtn.disabled = true;
-      status.classList.add('visible');
-      outputsGrid.classList.add('hidden');
-      outputsGrid.innerHTML = '';
+      statusEl.classList.add('visible');
+      outputSection.classList.remove('visible');
+      outputSection.innerHTML = '';
 
       const isCoaching = coachingToggle.checked;
-      if (isCoaching) {
-        statusText.textContent = 'Privacy filter active... stripping client details, then repurposing. 30-60 seconds.';
-      } else {
-        statusText.textContent = 'Repurposing your content... this takes 30-60 seconds.';
-      }
+      statusText.textContent = isCoaching
+        ? 'Privacy filter active... then generating. 30-60 seconds.'
+        : 'Generating content... 30-60 seconds.';
 
       try {
         const resp = await fetch(`${API_URL}/api/repurpose`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text,
-            source_type: uploadedText ? 'file' : 'text',
-            is_coaching: isCoaching
-          })
+          body: JSON.stringify({ text, source_type: 'text', is_coaching: isCoaching })
         });
-
         const data = await resp.json();
-
-        if (!resp.ok) {
-          throw new Error(data.error || 'Request failed');
-        }
+        if (!resp.ok) throw new Error(data.error || 'Request failed');
 
         renderOutputs(data.outputs);
         saveToHistory(data.id, text);
-
       } catch (err) {
         statusText.textContent = `Error: ${err.message}`;
-        setTimeout(() => status.classList.remove('visible'), 5000);
+        setTimeout(() => statusEl.classList.remove('visible'), 4000);
       } finally {
         repurposeBtn.disabled = false;
       }
     }
 
-    function isV2(outputs) {
-      return outputs.format_version === 2 || 'variants' in outputs;
-    }
-
     function renderOutputs(outputs) {
-      status.classList.remove('visible');
-      outputsGrid.classList.remove('hidden');
-      outputsGrid.innerHTML = '';
+      statusEl.classList.remove('visible');
+      outputSection.innerHTML = '';
+      outputSection.classList.add('visible');
 
-      if (isV2(outputs)) {
-        renderV2(outputs);
-      } else {
-        renderV1(outputs);
-      }
+      const isV2 = outputs.format_version === 2 || outputs.variants;
+      if (isV2) renderV2(outputs);
+      else renderV1(outputs);
     }
 
     function renderV2(outputs) {
-      // Creative Brief (full width, distinct style)
+      let delay = 0;
+
+      // Creative Brief
       const brief = outputs.creative_brief;
       if (brief && typeof brief === 'object') {
-        const card = document.createElement('div');
-        card.className = 'output-card brief-card';
+        const el = document.createElement('div');
+        el.className = 'card brief-card fade-in';
+        el.style.animationDelay = `${delay}s`;
+        delay += 0.08;
 
-        let html = '<div class="card-header"><h3>Creative Brief</h3></div>';
-
+        let html = '';
         if (brief.core_insight) {
-          html += `<div class="brief-field"><div class="brief-label">Core Insight</div><div class="content">${esc(brief.core_insight)}</div></div>`;
+          html += `<div class="brief-insight">${esc(brief.core_insight)}</div>`;
         }
-        if (brief.audience) {
-          html += `<div class="brief-field"><div class="brief-label">Audience</div><div class="content">${esc(brief.audience)}</div></div>`;
-        }
-        if (brief.tension) {
-          html += `<div class="brief-field"><div class="brief-label">Tension</div><div class="content">${esc(brief.tension)}</div></div>`;
-        }
+
+        const meta = [];
+        if (brief.audience) meta.push(`<span>Audience:</span> ${esc(brief.audience)}`);
+        if (brief.tension) meta.push(`<span>Tension:</span> ${esc(brief.tension)}`);
+        if (meta.length) html += `<div class="brief-meta">${meta.join('<br>')}</div>`;
+
         if (brief.verbatim_lines && brief.verbatim_lines.length) {
-          html += '<div class="brief-field"><div class="brief-label">Best Verbatim Lines</div>';
+          html += '<div class="brief-quotes">';
           for (const line of brief.verbatim_lines) {
-            html += `<blockquote>${esc(line)}</blockquote>`;
+            html += `<p>"${esc(line)}"</p>`;
           }
           html += '</div>';
         }
-        if (brief.other_angles && brief.other_angles.length) {
-          html += '<div class="brief-field"><div class="brief-label">Other Angles</div><div class="angles">';
-          for (const angle of brief.other_angles) {
-            html += `<div>- ${esc(angle)}</div>`;
-          }
-          html += '</div></div>';
-        }
 
-        card.innerHTML = html;
-        outputsGrid.appendChild(card);
+        el.innerHTML = html;
+        outputSection.appendChild(el);
       }
 
-      // 5 Variants
+      // Variants
       const variants = outputs.variants || {};
-      for (const key of V2_VARIANT_ORDER) {
+      for (const key of V2_ORDER) {
         const text = variants[key];
         if (!text) continue;
-        const label = V2_LABELS[key] || key;
-        const card = document.createElement('div');
-        card.className = 'output-card';
-        card.innerHTML = `
-          <div class="card-header">
-            <h3>${label}</h3>
-            <div style="display:flex;gap:6px">
-              <button class="save-btn" onclick="saveToLibrary(this, ${JSON.stringify(text).replace(/</g, '\\u003c')}, '${key}')">Save</button>
-              <button class="copy-btn" onclick="copyText(this, ${JSON.stringify(text).replace(/</g, '\\u003c')})">Copy</button>
+
+        const el = document.createElement('div');
+        el.className = 'card variant-card fade-in';
+        el.style.animationDelay = `${delay}s`;
+        delay += 0.08;
+
+        el.innerHTML = `
+          <div class="variant-header">
+            <div class="variant-type">${V2_LABELS[key] || key}</div>
+            <div class="variant-actions">
+              <button class="btn-sm" onclick="saveToLibrary(this, ${JSON.stringify(text).replace(/</g, '\\u003c')}, '${key}')">Save</button>
+              <button class="btn-sm" onclick="copyText(this, ${JSON.stringify(text).replace(/</g, '\\u003c')})">Copy</button>
             </div>
           </div>
-          <div class="content">${esc(text)}</div>
+          <div class="variant-text">${esc(text)}</div>
         `;
-        outputsGrid.appendChild(card);
+        outputSection.appendChild(el);
       }
 
-      // Anchor Comments
+      // Anchor Comments + Image Recs side by side
       const comments = outputs.anchor_comments;
-      if (comments && typeof comments === 'object') {
-        const card = document.createElement('div');
-        card.className = 'output-card comments-card';
-        let html = '<div class="card-header"><h3>Anchor Comments</h3></div>';
+      const recs = outputs.image_recs;
 
-        const commentTypes = [
-          ['engagement', 'Engagement'],
-          ['teaching', 'Teaching'],
-          ['social_proof', 'Social Proof']
-        ];
-        for (const [key, label] of commentTypes) {
-          if (comments[key]) {
-            html += `<div class="comment-option">
-              <div class="comment-label">Option: ${label}</div>
-              <div class="content">${esc(comments[key])}</div>
-              <button class="copy-btn" style="margin-top:6px" onclick="copyText(this, ${JSON.stringify(comments[key]).replace(/</g, '\\u003c')})">Copy</button>
+      if ((comments && typeof comments === 'object') || (recs && Array.isArray(recs) && recs.length)) {
+        const grid = document.createElement('div');
+        grid.className = 'extras-grid fade-in';
+        grid.style.animationDelay = `${delay}s`;
+
+        if (comments && typeof comments === 'object') {
+          const card = document.createElement('div');
+          card.className = 'extras-card';
+          let html = '<div class="card-label">Anchor Comments</div>';
+          const types = [['engagement', 'Engagement'], ['teaching', 'Teaching'], ['social_proof', 'Social Proof']];
+          for (const [k, label] of types) {
+            if (comments[k]) {
+              html += `<div class="extras-item">
+                <div class="extras-item-label">${label}</div>
+                <div class="extras-item-text">${esc(comments[k])}</div>
+              </div>`;
+            }
+          }
+          card.innerHTML = html;
+          grid.appendChild(card);
+        }
+
+        if (recs && Array.isArray(recs) && recs.length) {
+          const card = document.createElement('div');
+          card.className = 'extras-card';
+          let html = '<div class="card-label">Image Ideas</div>';
+          for (const rec of recs) {
+            const rtype = (rec.type || '').replace(/_/g, ' ');
+            html += `<div class="extras-item">
+              <div class="extras-item-label">${esc(rtype)}</div>
+              <div class="extras-item-text">${esc(rec.description || '')}</div>
             </div>`;
           }
+          card.innerHTML = html;
+          grid.appendChild(card);
         }
-        card.innerHTML = html;
-        outputsGrid.appendChild(card);
-      }
 
-      // Image Recommendations
-      const recs = outputs.image_recs;
-      if (recs && Array.isArray(recs) && recs.length) {
-        const card = document.createElement('div');
-        card.className = 'output-card recs-card';
-        let html = '<div class="card-header"><h3>Image Recommendations</h3></div>';
-        for (let i = 0; i < recs.length; i++) {
-          const rtype = (recs[i].type || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-          html += `<div class="rec-item"><div class="rec-type">Option ${i + 1} (${esc(rtype)})</div><div class="content">${esc(recs[i].description || '')}</div></div>`;
-        }
-        card.innerHTML = html;
-        outputsGrid.appendChild(card);
+        outputSection.appendChild(grid);
       }
     }
 
     function renderV1(outputs) {
-      for (const key of V1_OUTPUT_ORDER) {
+      const labels = {
+        linkedin_post: 'LinkedIn Post', twitter_post: 'X Post', threads_post: 'Threads',
+        instagram_caption: 'Instagram', newsletter_section: 'Newsletter',
+        blog_post: 'Blog Post', blog_excerpt: 'Blog Excerpt', pull_quotes: 'Pull Quotes',
+        one_liner: 'One-Liner', cta_variations: 'CTAs'
+      };
+      for (const [key, label] of Object.entries(labels)) {
         if (!(key in outputs)) continue;
-        const value = outputs[key];
-        const label = V1_OUTPUT_LABELS[key] || key;
+        const val = outputs[key];
+        const el = document.createElement('div');
+        el.className = 'card variant-card fade-in';
 
-        const card = document.createElement('div');
-        card.className = 'output-card';
-        if (key === 'blog_post') card.className += ' full-width';
-
-        let contentHtml = '';
+        let display = '';
         let copyVal = '';
-
-        if (key === 'blog_post' && typeof value === 'object') {
-          const title = value.title || '';
-          const body = value.body || '';
-          contentHtml = `<div class="blog-title">${esc(title)}</div><div class="content blog-body">${esc(body)}</div>`;
-          copyVal = `${title}\n\n${body}`;
-        } else if (Array.isArray(value)) {
-          const items = value.map((v, i) => `${i + 1}. ${v}`).join('\n');
-          contentHtml = `<div class="content">${esc(items)}</div>`;
-          copyVal = value.join('\n');
+        if (key === 'blog_post' && typeof val === 'object') {
+          display = `${val.title || ''}\n\n${val.body || ''}`;
+          copyVal = display;
+        } else if (Array.isArray(val)) {
+          display = val.map((v, i) => `${i + 1}. ${v}`).join('\n');
+          copyVal = val.join('\n');
         } else {
-          contentHtml = `<div class="content">${esc(String(value))}</div>`;
-          copyVal = String(value);
+          display = String(val);
+          copyVal = display;
         }
 
-        card.innerHTML = `
-          <div class="card-header">
-            <h3>${label}</h3>
-            <button class="copy-btn" onclick="copyText(this, ${JSON.stringify(copyVal).replace(/</g, '\\u003c')})">Copy</button>
+        el.innerHTML = `
+          <div class="variant-header">
+            <div class="variant-type">${label}</div>
+            <div class="variant-actions">
+              <button class="btn-sm" onclick="copyText(this, ${JSON.stringify(copyVal).replace(/</g, '\\u003c')})">Copy</button>
+            </div>
           </div>
-          ${contentHtml}
+          <div class="variant-text">${esc(display)}</div>
         `;
-        outputsGrid.appendChild(card);
+        outputSection.appendChild(el);
       }
     }
 
+    // Helpers
     function esc(str) {
       const d = document.createElement('div');
       d.textContent = str;
@@ -814,14 +658,10 @@
       navigator.clipboard.writeText(text).then(() => {
         btn.textContent = 'Copied';
         btn.classList.add('copied');
-        setTimeout(() => {
-          btn.textContent = 'Copy';
-          btn.classList.remove('copied');
-        }, 2000);
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
       });
     }
 
-    // Save to Voice Library
     async function saveToLibrary(btn, text, variantType) {
       btn.disabled = true;
       btn.textContent = 'Saving...';
@@ -829,11 +669,7 @@
         const resp = await fetch(`${API_URL}/api/voice-library`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text,
-            variant_type: variantType,
-            source: 'repurpose_output'
-          })
+          body: JSON.stringify({ text, variant_type: variantType, source: 'repurpose_output' })
         });
         if (resp.ok) {
           btn.textContent = 'Saved';
@@ -842,7 +678,7 @@
           btn.textContent = 'Error';
           setTimeout(() => { btn.textContent = 'Save'; btn.disabled = false; }, 2000);
         }
-      } catch (err) {
+      } catch {
         btn.textContent = 'Error';
         setTimeout(() => { btn.textContent = 'Save'; btn.disabled = false; }, 2000);
       }
@@ -851,11 +687,7 @@
     // History
     function saveToHistory(id, text) {
       const history = JSON.parse(localStorage.getItem('repurpose_history') || '[]');
-      history.unshift({
-        id,
-        preview: text.substring(0, 80),
-        date: new Date().toLocaleString()
-      });
+      history.unshift({ id, preview: text.substring(0, 80), date: new Date().toLocaleDateString() });
       if (history.length > 20) history.length = 20;
       localStorage.setItem('repurpose_history', JSON.stringify(history));
       renderHistory();
@@ -864,33 +696,40 @@
     function renderHistory() {
       const list = document.getElementById('historyList');
       const history = JSON.parse(localStorage.getItem('repurpose_history') || '[]');
+      if (!history.length) {
+        document.getElementById('historySection').style.display = 'none';
+        return;
+      }
+      document.getElementById('historySection').style.display = 'block';
       list.innerHTML = history.map(h => `
         <div class="history-item" onclick="loadJob('${h.id}')">
-          <div class="h-date">${h.date}</div>
           <div class="h-preview">${esc(h.preview)}</div>
+          <div class="h-date">${h.date}</div>
         </div>
       `).join('');
     }
 
+    function toggleHistory() {
+      const list = document.getElementById('historyList');
+      const btn = list.previousElementSibling.querySelector('.btn-toggle');
+      list.classList.toggle('open');
+      btn.textContent = list.classList.contains('open') ? 'Hide' : 'Show';
+    }
+
     async function loadJob(id) {
-      status.classList.add('visible');
-      statusText.textContent = 'Loading job...';
-      outputsGrid.classList.add('hidden');
+      statusEl.classList.add('visible');
+      statusText.textContent = 'Loading...';
+      outputSection.classList.remove('visible');
 
       try {
         const resp = await fetch(`${API_URL}/api/repurpose/${id}`);
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'Not found');
         renderOutputs(data.outputs);
-        toggleHistory();
       } catch (err) {
         statusText.textContent = `Error: ${err.message}`;
-        setTimeout(() => status.classList.remove('visible'), 3000);
+        setTimeout(() => statusEl.classList.remove('visible'), 3000);
       }
-    }
-
-    function toggleHistory() {
-      document.getElementById('historyPanel').classList.toggle('open');
     }
 
     // Init
