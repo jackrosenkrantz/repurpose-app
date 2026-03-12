@@ -235,6 +235,114 @@
     .btn-sm:hover { border-color: var(--amber); color: var(--amber); }
     .btn-sm.copied { border-color: var(--sage); color: var(--sage); }
     .btn-sm.saved { border-color: var(--sage); color: var(--sage); }
+    .btn-sm.publishing { border-color: var(--amber); color: var(--amber); opacity: 0.7; cursor: wait; }
+
+    /* Publish panel */
+    .publish-panel {
+      margin-top: 12px;
+      padding: 16px;
+      background: var(--sand);
+      border: 1px solid var(--stone);
+      border-radius: 8px;
+      display: none;
+    }
+    .publish-panel.open { display: block; }
+    .publish-panel .card-label { margin-bottom: 10px; }
+
+    .platform-toggles {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .platform-toggle {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border: 1px solid var(--stone);
+      border-radius: 100px;
+      cursor: pointer;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--earth);
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .platform-toggle.active { border-color: var(--amber); color: var(--amber); background: var(--amber-light); }
+    .platform-toggle.disabled { opacity: 0.3; cursor: not-allowed; }
+    .platform-toggle input { display: none; }
+
+    .publish-btn {
+      padding: 8px 20px;
+      background: var(--amber);
+      color: var(--sand);
+      border: none;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .publish-btn:hover { opacity: 0.9; }
+    .publish-btn:disabled { background: var(--stone); color: var(--warm-gray); cursor: not-allowed; }
+
+    .publish-status {
+      margin-top: 10px;
+    }
+    .publish-status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      font-size: 0.75rem;
+      color: var(--earth);
+    }
+    .publish-status-item .platform-name {
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.65rem;
+      min-width: 70px;
+    }
+    .publish-status-item .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--stone);
+    }
+    .publish-status-item .status-dot.pending { background: var(--warm-gray); }
+    .publish-status-item .status-dot.publishing { background: var(--amber); animation: pulse 1s ease infinite; }
+    .publish-status-item .status-dot.published { background: var(--sage); }
+    .publish-status-item .status-dot.failed { background: #c46a6a; }
+    .publish-status-item .status-dot.skipped { background: var(--warm-gray); }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    /* API key setup */
+    .api-key-setup {
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--card);
+      border-radius: 8px;
+      font-size: 0.75rem;
+      color: var(--earth);
+    }
+    .api-key-setup input {
+      width: 100%;
+      margin-top: 6px;
+      padding: 8px 10px;
+      background: transparent;
+      border: 1px solid var(--stone);
+      border-radius: 6px;
+      color: var(--deep);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      outline: none;
+    }
+    .api-key-setup input:focus { border-color: var(--amber); }
 
     .variant-text {
       font-size: 0.88rem;
@@ -448,6 +556,8 @@
     const outputSection = document.getElementById('outputSection');
     const inputSection = document.getElementById('inputSection');
 
+    let currentJobId = null;
+
     const V2_ORDER = ['sales', 'poetic', 'radical', 'weekend_bridge', 'short_contrarian'];
     const V2_LABELS = {
       sales: 'Sales', poetic: 'Poetic', radical: 'Radical',
@@ -486,6 +596,7 @@
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'Request failed');
 
+        currentJobId = data.id;
         renderOutputs(data.outputs);
         saveToHistory(data.id, text);
       } catch (err) {
@@ -548,17 +659,31 @@
         const el = document.createElement('div');
         el.className = 'card variant-card fade-in';
         el.style.animationDelay = `${delay}s`;
+        el.dataset.variantType = key;
+        el.dataset.variantText = text;
         delay += 0.08;
 
         el.innerHTML = `
           <div class="variant-header">
             <div class="variant-type">${V2_LABELS[key] || key}</div>
             <div class="variant-actions">
-              <button class="btn-sm" onclick="saveToLibrary(this, ${JSON.stringify(text).replace(/</g, '\\u003c')}, '${key}')">Save</button>
-              <button class="btn-sm" onclick="copyText(this, ${JSON.stringify(text).replace(/</g, '\\u003c')})">Copy</button>
+              <button class="btn-sm" data-action="save" data-type="${key}">Save</button>
+              <button class="btn-sm" data-action="copy">Copy</button>
+              <button class="btn-sm" data-action="publish">Publish</button>
             </div>
           </div>
           <div class="variant-text">${esc(text)}</div>
+          <div class="publish-panel" data-panel="${key}">
+            <div class="card-label">Publish to</div>
+            <div class="platform-toggles">
+              <label class="platform-toggle active" data-platform="x"><input type="checkbox" checked>X</label>
+              <label class="platform-toggle active" data-platform="threads"><input type="checkbox" checked>Threads</label>
+              <label class="platform-toggle active" data-platform="facebook"><input type="checkbox" checked>Facebook</label>
+              <label class="platform-toggle disabled" data-platform="instagram" title="Coming in Phase 2"><input type="checkbox" disabled>Instagram</label>
+            </div>
+            <button class="publish-btn" data-action="publish-go">Publish Now</button>
+            <div class="publish-status"></div>
+          </div>
         `;
         outputSection.appendChild(el);
       }
@@ -654,12 +779,227 @@
       return d.innerHTML;
     }
 
-    function copyText(btn, text) {
-      navigator.clipboard.writeText(text).then(() => {
-        btn.textContent = 'Copied';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    function getPublishKey() {
+      return localStorage.getItem('publish_api_key') || '';
+    }
+
+    function setPublishKey(key) {
+      localStorage.setItem('publish_api_key', key);
+    }
+
+    // Event delegation for variant card buttons
+    outputSection.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const card = btn.closest('.variant-card');
+      if (!card) return;
+
+      const action = btn.dataset.action;
+      const text = card.dataset.variantText;
+      const type = card.dataset.variantType;
+
+      if (action === 'copy') {
+        navigator.clipboard.writeText(text).then(() => {
+          btn.textContent = 'Copied';
+          btn.classList.add('copied');
+          setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+        });
+      } else if (action === 'save') {
+        saveToLibrary(btn, text, type);
+      } else if (action === 'publish') {
+        togglePublishPanel(card);
+      } else if (action === 'publish-go') {
+        publishVariant(card, btn);
+      }
+    });
+
+    // Platform toggle clicks
+    outputSection.addEventListener('click', (e) => {
+      const toggle = e.target.closest('.platform-toggle:not(.disabled)');
+      if (!toggle) return;
+      const cb = toggle.querySelector('input');
+      cb.checked = !cb.checked;
+      toggle.classList.toggle('active', cb.checked);
+    });
+
+    function togglePublishPanel(card) {
+      const panel = card.querySelector('.publish-panel');
+      if (!panel) return;
+
+      // Check for API key
+      if (!getPublishKey()) {
+        panel.classList.add('open');
+        panel.innerHTML = `
+          <div class="api-key-setup">
+            <div>Enter your publish API key to enable posting:</div>
+            <input type="password" placeholder="Paste API key..." data-action="save-key">
+          </div>
+        `;
+        const input = panel.querySelector('input');
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && input.value.trim()) {
+            setPublishKey(input.value.trim());
+            // Re-render the panel with toggles
+            rebuildPublishPanel(card, panel);
+          }
+        });
+        return;
+      }
+
+      panel.classList.toggle('open');
+    }
+
+    function rebuildPublishPanel(card, panel) {
+      const type = card.dataset.variantType;
+      panel.innerHTML = `
+        <div class="card-label">Publish to</div>
+        <div class="platform-toggles">
+          <label class="platform-toggle active" data-platform="x"><input type="checkbox" checked>X</label>
+          <label class="platform-toggle active" data-platform="threads"><input type="checkbox" checked>Threads</label>
+          <label class="platform-toggle active" data-platform="facebook"><input type="checkbox" checked>Facebook</label>
+          <label class="platform-toggle disabled" data-platform="instagram" title="Coming in Phase 2"><input type="checkbox" disabled>Instagram</label>
+        </div>
+        <button class="publish-btn" data-action="publish-go">Publish Now</button>
+        <div class="publish-status"></div>
+      `;
+    }
+
+    async function publishVariant(card, btn) {
+      const key = getPublishKey();
+      if (!key) return;
+
+      const text = card.dataset.variantText;
+      const type = card.dataset.variantType;
+      const panel = card.querySelector('.publish-panel');
+      const statusDiv = panel.querySelector('.publish-status');
+
+      // Get selected platforms
+      const platforms = [];
+      panel.querySelectorAll('.platform-toggle.active input:checked').forEach(cb => {
+        platforms.push(cb.closest('.platform-toggle').dataset.platform);
       });
+
+      if (!platforms.length) {
+        statusDiv.innerHTML = '<div class="publish-status-item" style="color:#c46a6a">Select at least one platform</div>';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Publishing...';
+
+      // Show pending status for each platform
+      statusDiv.innerHTML = platforms.map(p =>
+        `<div class="publish-status-item" data-platform="${p}">
+          <span class="status-dot publishing"></span>
+          <span class="platform-name">${p}</span>
+          <span class="status-msg">Waiting...</span>
+        </div>`
+      ).join('');
+
+      try {
+        const resp = await fetch(`${API_URL}/api/publish`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Publish-Key': key,
+          },
+          body: JSON.stringify({
+            variant_text: text,
+            variant_type: type,
+            platforms,
+            repurpose_job_id: currentJobId || '',
+          }),
+        });
+
+        if (resp.status === 401) {
+          statusDiv.innerHTML = '<div class="publish-status-item" style="color:#c46a6a">Invalid API key. Check your key and try again.</div>';
+          btn.disabled = false;
+          btn.textContent = 'Publish Now';
+          return;
+        }
+
+        if (resp.status === 429) {
+          statusDiv.innerHTML = '<div class="publish-status-item" style="color:#c46a6a">Rate limit exceeded. Try again later.</div>';
+          btn.disabled = false;
+          btn.textContent = 'Publish Now';
+          return;
+        }
+
+        // Read SSE stream
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+
+          let eventType = '';
+          for (const line of lines) {
+            if (line.startsWith('event: ')) {
+              eventType = line.slice(7).trim();
+            } else if (line.startsWith('data: ') && eventType) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                handlePublishEvent(statusDiv, eventType, data);
+              } catch {}
+              eventType = '';
+            }
+          }
+        }
+      } catch (err) {
+        statusDiv.innerHTML = `<div class="publish-status-item" style="color:#c46a6a">Error: ${esc(err.message)}</div>`;
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Publish Now';
+    }
+
+    function handlePublishEvent(statusDiv, event, data) {
+      if (event === 'progress') {
+        // Update a general status line
+        const existing = statusDiv.querySelector('.progress-msg');
+        if (existing) {
+          existing.textContent = data.message;
+        } else {
+          const el = document.createElement('div');
+          el.className = 'publish-status-item progress-msg';
+          el.style.color = 'var(--earth)';
+          el.textContent = data.message;
+          statusDiv.prepend(el);
+        }
+      } else if (event === 'adapted') {
+        // Show adapted text preview (could expand later)
+        const item = statusDiv.querySelector(`[data-platform="${data.platform}"]`);
+        if (item) {
+          const msg = item.querySelector('.status-msg');
+          const preview = (data.text || '').slice(0, 60);
+          msg.textContent = preview ? `Adapted: "${preview}..."` : 'Adapted';
+        }
+      } else if (event === 'result') {
+        const item = statusDiv.querySelector(`[data-platform="${data.platform}"]`);
+        if (item) {
+          const dot = item.querySelector('.status-dot');
+          const msg = item.querySelector('.status-msg');
+          dot.className = `status-dot ${data.status}`;
+          if (data.status === 'published') {
+            msg.textContent = 'Published';
+            msg.style.color = 'var(--sage)';
+          } else if (data.status === 'failed') {
+            msg.textContent = data.error || 'Failed';
+            msg.style.color = '#c46a6a';
+          } else if (data.status === 'skipped') {
+            msg.textContent = data.message || 'Skipped';
+          }
+        }
+      } else if (event === 'complete') {
+        const progress = statusDiv.querySelector('.progress-msg');
+        if (progress) progress.remove();
+      }
     }
 
     async function saveToLibrary(btn, text, variantType) {
@@ -733,6 +1073,7 @@
         const resp = await fetch(`${API_URL}/api/repurpose/${id}`);
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'Not found');
+        currentJobId = id;
         renderOutputs(data.outputs);
       } catch (err) {
         statusText.textContent = `Error: ${err.message}`;
