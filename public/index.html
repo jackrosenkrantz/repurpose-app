@@ -987,7 +987,12 @@
           const msg = item.querySelector('.status-msg');
           dot.className = `status-dot ${data.status}`;
           if (data.status === 'published') {
-            msg.textContent = 'Published';
+            const url = data.url || '';
+            if (url) {
+              msg.innerHTML = `<a href="${esc(url)}" target="_blank" rel="noopener" style="color:var(--sage);text-decoration:underline">Published — View</a>`;
+            } else {
+              msg.textContent = 'Published';
+            }
             msg.style.color = 'var(--sage)';
           } else if (data.status === 'failed') {
             msg.textContent = data.error || 'Failed';
